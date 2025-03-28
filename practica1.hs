@@ -102,7 +102,7 @@ permutaciones xs = foldr (\x rec -> concatMap (\xs -> Prelude.map (f x xs) [0..l
 
 -- ej 5
 
--- elementosEnPisicionesPares usa recursión estructural???
+-- elementosEnPosicionesPares usa recursión estructural???
 
 -- entrelazar usa recursión estructural
 
