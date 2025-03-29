@@ -106,8 +106,26 @@ permutaciones xs = foldr (\x rec -> concatMap (\xs -> Prelude.map (f x xs) [0..l
 
 -- entrelazar usa recursión estructural
 
---entrelazar :: [a] -> [a] -> [a]
--- entrelazar xs ys = foldr (\x r -> if (length xs - length r) > length ys then x : r else x : (drop )) [] xs
 
 entrelazar :: [a] -> [a] -> [a]
-entrelazar xs ys = foldr (\x r -> x : r) ys xs
+entrelazar = foldr (\x rec ys -> if null ys
+    then x : rec []
+    else x : head ys : rec (tail ys)) id
+
+
+-- ej 6
+
+recr :: (a -> [a] -> b -> b) -> b -> [a] -> b
+recr _ z [] = z
+recr f z (x : xs) = f x xs (recr f z xs)
+
+sacarUna :: Eq a => a -> [a] -> [a]
+sacarUna e xs = recr (\x xs rec -> if x == e then xs else x : rec) [] xs
+
+-- por cada llamado recursivo hay un x y un xs distintos.
+
+-- b) foldr no es adecuado ya que no guarda en su recursión al xs en cada momento
+-- QUiero que se "resetee" la lista en algun momento
+
+insertarOrdenado :: Ord a => a -> [a] -> [a]
+insertarOrdenado e xs = recr (\x xs rec -> if e < x then e : x : xs else x : rec) [e] xs
