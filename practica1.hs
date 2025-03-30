@@ -149,3 +149,34 @@ mapDoble f = foldr (\x rec ys ->
 
 -- foldr en armarPares y mapDoble es una funcion de [b] -> [c]
 -- no como los normales que foldr devuelve [b]
+
+-- ej  8
+
+sumaMat :: [[Int]] -> [[Int]] -> [[Int]]
+sumaMat xs ys = zipWith (\x y -> zipWith (+) x y) xs ys
+
+-- trasponer :: [[Int]] -> [[Int]]
+-- NOSE
+
+-- ej 9
+
+foldNat :: (Integer -> Integer -> Integer) -> Integer -> Integer -> Integer
+foldNat f x 0 = x
+foldNat f x n = f n (foldNat f x (n-1))
+
+potencia :: Integer -> Integer -> Integer
+potencia b p = foldNat (\x rec -> b * rec) 1 p 
+
+-- ej 10
+
+-- genLista :: a -> (a-> a) -> Integer -> [a]
+-- genLista _ _ 0 = []
+-- genLista elem f len = elem : genLista (f elem) f (len - 1)
+
+genLista :: a -> (a-> a) -> Integer -> [a]
+genLista elem f len = foldr (\x rec ys -> ys : rec (f ys)) (const []) [1..len] elem
+
+desdeHasta :: Integer -> Integer -> [Integer]
+desdeHasta d h = genLista d (+1) (h - d + 1) 
+
+-- ej 11
