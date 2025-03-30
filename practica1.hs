@@ -107,10 +107,10 @@ permutaciones xs = foldr (\x rec -> concatMap (\xs -> Prelude.map (f x xs) [0..l
 -- entrelazar usa recursión estructural
 
 
-entrelazar :: [a] -> [a] -> [a]
-entrelazar = foldr (\x rec ys -> if null ys
+entrelazar :: [a] -> [a] -> [a] -- PREGUNTAR
+entrelazar xs ys = foldr (\x rec ys -> if null ys
     then x : rec []
-    else x : head ys : rec (tail ys)) id
+    else x : head ys : rec (tail ys)) id xs ys
 
 
 -- ej 6
@@ -129,3 +129,23 @@ sacarUna e xs = recr (\x xs rec -> if x == e then xs else x : rec) [] xs
 
 insertarOrdenado :: Ord a => a -> [a] -> [a]
 insertarOrdenado e xs = recr (\x xs rec -> if e < x then e : x : xs else x : rec) [e] xs
+
+-- ej 7
+
+mapPares :: (a -> b -> c) -> [(a, b)] -> [c]
+mapPares f xs = foldr (\x rec -> Main.uncurry f x : rec) [] xs
+
+armarPares :: [a] -> [b] -> [(a, b)]
+armarPares = foldr (\x rec ys -> 
+    if null ys
+        then []
+        else (x, head ys) : rec (tail ys)) (const [])
+
+mapDoble :: (a -> b -> c) -> [a] -> [b] -> [c]
+mapDoble f = foldr (\x rec ys ->
+    if null ys
+        then []
+        else f x (head ys) : rec (tail ys)) (const [])
+
+-- foldr en armarPares y mapDoble es una funcion de [b] -> [c]
+-- no como los normales que foldr devuelve [b]
