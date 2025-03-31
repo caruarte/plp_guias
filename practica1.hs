@@ -180,3 +180,46 @@ desdeHasta :: Integer -> Integer -> [Integer]
 desdeHasta d h = genLista d (+1) (h - d + 1) 
 
 -- ej 11
+
+data Polinomio a = X | Cte a | Suma (Polinomio a) (Polinomio a) | Prod (Polinomio a) (Polinomio a)
+
+foldPol :: Num a => Polinomio a -> a -> a
+foldPol X elem = elem 
+foldPol (Cte x) elem = x
+foldPol (Suma x y) elem = foldPol x elem + foldPol y elem
+foldPol (Prod x y) elem = foldPol x elem * foldPol y elem
+
+evaluar :: Num a => a -> Polinomio a -> a
+evaluar x pol = foldPol pol x
+
+-- ej 12
+
+data AB a = Nil | Bin (AB a) a (AB a) deriving Show
+
+foldAB :: (a -> b -> b -> b) -> b -> AB a -> b
+foldAB _ b Nil = b
+foldAB f b (Bin izq r der) = f r (foldAB f b izq) (foldAB f b der)
+
+recAB :: (a -> AB a -> AB a -> b -> b -> b) -> b -> AB a -> b
+recAB _ b Nil = b
+recAB f b (Bin izq r der) = f r izq der (recAB f b izq) (recAB f b der)
+
+esNil :: AB a -> Bool
+esNil Nil = True
+esNil _ = False
+
+altura :: AB a -> Integer
+altura x = foldAB (\x izq der -> 1 + max izq der) 0 x
+
+cantNodos :: AB a -> Integer
+cantNodos x = foldAB (\x izq der -> 1 + izq + der) 0 x
+
+-- mejorSegunAB :: (a -> a -> Bool) -> AB a -> a
+-- mejorSegunAB f x = foldAB (\x izq der -> if f x izq then (if f x der then x else der) else (if f izq der then izq else der)) Nil x
+
+-- NOSE COMO HACER LO DE NIL
+
+esABB :: Ord a => AB a -> Bool
+esABB arbol = recAB (\x (Bin _ izq _) (Bin _ der _) rec1 rec2 -> rec1 && rec2 && (if izq <= x then (if der > x then True else False) else False)) True arbol
+
+-- NOSE COMO HACER CON EL CASO DE NIL
