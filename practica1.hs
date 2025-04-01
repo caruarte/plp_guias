@@ -46,10 +46,20 @@ flipAll = Prelude.map flip
 
 -- Está currificada
 
--- flipRaro :: (Float -> Float -> Float) -> Float -> Float -> Float 
--- flipRaro = flip flip
+flipRaro :: b -> (a -> b -> c) -> a -> c
+flipRaro = flip flip
 
--- NOSE
+flipComposicion :: (b -> a -> c) -> b -> a -> c
+flipComposicion = flip . flip
+
+-- flip :: (a -> b -> c) -> b -> a -> c
+-- flip flip :: b -> (a -> b -> c) -> a -> c
+
+-- si hay 4 argumetos y flip admite una funcion de tres, se juntan de atras para adelante.
+
+-- NO CONFUNDIR COMPONER FUNCIONES CON METERLE UNA FUNCION A OTRA FUNCION
+
+-- Esta currificada
 
 -- ej 2
 
@@ -93,6 +103,9 @@ sumasAlt xs = foldr (-) 0 xs
 
 sumasAltInverso :: Num a => [a]  -> a
 sumasAltInverso xs = sumasAlt (reverse xs) -- se puede hacer con reverse?
+
+sumasAltInv :: Num a => [a] -> a
+sumasAltInv xs = foldl (\x rec -> rec - x) 0 xs -- sin reverse
 
 -- ej 4
 
@@ -223,3 +236,28 @@ esABB :: Ord a => AB a -> Bool
 esABB arbol = recAB (\x (Bin _ izq _) (Bin _ der _) rec1 rec2 -> rec1 && rec2 && (if izq <= x then (if der > x then True else False) else False)) True arbol
 
 -- NOSE COMO HACER CON EL CASO DE NIL
+
+-- ej 15
+
+data Rose a = Node a [Rose a]
+
+foldRose :: (a -> [b] -> b) -> Rose a -> b
+foldRose f (Node r hijos) = f r (Main.map (foldRose f) hijos)
+
+hojas :: Rose a -> [a]
+hojas xs = foldRose (\x rec -> if null rec then [x] else concat rec) xs
+
+-- rec es la lista de listas de resultados de aplicar la funcion recursiva en los hijos.
+-- en las hojas se devuelve [x]
+-- en los otros nodos viene [[x],[y]] y devuelve [x, y]
+
+distancias :: Rose a -> [Integer]
+distancias xs = foldRose (\x rec -> if null rec then [0] else Main.map (+1) (concat rec)) xs
+
+-- rec es una lista de numeros
+-- rec casi siempre coincide con lo que devuelve la funcion principal.
+
+-- f 5 []
+
+alturaRose :: Rose a -> Integer
+alturaRose xs = foldRose (\x rec -> if null rec then 1 else (maximum rec) + 1) xs
