@@ -202,8 +202,20 @@ foldPol (Cte x) elem = x
 foldPol (Suma x y) elem = foldPol x elem + foldPol y elem
 foldPol (Prod x y) elem = foldPol x elem * foldPol y elem
 
+foldPol2 :: Num a => (b) -> (a -> b) -> (b -> b -> b) -> (b -> b -> b) -> Polinomio a -> b
+foldPol2 fX fCte fSuma fProd pol = case pol of
+        X -> fX
+        Cte x -> fCte x
+        Suma x y -> fSuma (rec x) (rec y)
+        Prod x y -> fProd (rec x) (rec y)
+        where rec = foldPol2 fX fCte fSuma fProd
+
 evaluar :: Num a => a -> Polinomio a -> a
 evaluar x pol = foldPol pol x
+
+evaluar2 :: Num a => a -> Polinomio a -> a
+evaluar2 x pol = foldPol2 (x) (id) (\izq der -> izq + der) (\izq der -> izq * der) pol
+
 
 -- ej 12
 
@@ -213,10 +225,12 @@ foldAB :: (a -> b -> b -> b) -> b -> AB a -> b
 foldAB _ b Nil = b
 foldAB f b (Bin izq r der) = f r (foldAB f b izq) (foldAB f b der)
 
+data AEB a = Hoja a | Bin2 (AEB a) a (AEB a) deriving Show
+
 foldAEB :: ( a -> b ) -> ( b -> a -> b -> b ) -> AEB a -> b
 foldAEB fHoja fBin t = case t of
     Hoja n -> fHoja n
-    Bin t1 n t2 -> fBin ( rec t1 ) n ( rec t2 )
+    Bin2 t1 n t2 -> fBin ( rec t1 ) n ( rec t2 )
     where rec = foldAEB fHoja fBin
 
 recAB :: (a -> AB a -> AB a -> b -> b -> b) -> b -> AB a -> b
