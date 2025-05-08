@@ -213,6 +213,12 @@ foldAB :: (a -> b -> b -> b) -> b -> AB a -> b
 foldAB _ b Nil = b
 foldAB f b (Bin izq r der) = f r (foldAB f b izq) (foldAB f b der)
 
+foldAEB :: ( a -> b ) -> ( b -> a -> b -> b ) -> AEB a -> b
+foldAEB fHoja fBin t = case t of
+    Hoja n -> fHoja n
+    Bin t1 n t2 -> fBin ( rec t1 ) n ( rec t2 )
+    where rec = foldAEB fHoja fBin
+
 recAB :: (a -> AB a -> AB a -> b -> b -> b) -> b -> AB a -> b
 recAB _ b Nil = b
 recAB f b (Bin izq r der) = f r izq der (recAB f b izq) (recAB f b der)
